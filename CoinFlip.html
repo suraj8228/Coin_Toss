@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Flip Game</title>
+<style>
+    body {
+        background: linear-gradient(to bottom, #6dd5ed, #2193b0);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    h1 {
+        text-align: center;
+        color: white;
+        font-size: 50px;
+        margin-top: 30px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .captain-input, .role-select {
+        position: absolute;
+        font-size: 18px;
+        font-weight: bold;
+        width: 180px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 2px solid #fff;
+        outline: none;
+        text-align: center;
+    }
+    #captainA { top: 150px; left: 100px; }
+    #captainB { top: 150px; right: 100px; }
+    #roleA { top: 220px; left: 100px; }
+    #roleB { top: 220px; right: 100px; }
+
+    .coin {
+        height: 180px;
+        width: 180px;
+        border-radius: 50%;
+        position: absolute;
+        top: 300px;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .countdown, .result {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        font-weight: bold;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px 60px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        z-index: 10;
+        color: #333;
+    }
+
+    /* Credit */
+    .credit {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        font-size: 14px;
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+</style>
+</head>
+<body>
+
+<h1>WELCOME CAPTAINS<br>LET'S TOSS THE COIN</h1>
+
+<!-- Captain Name Inputs -->
+<input type="text" id="captainA" class="captain-input" placeholder="Captain A">
+<input type="text" id="captainB" class="captain-input" placeholder="Captain B">
+
+<!-- Who Tosses / Who Calls -->
+<select id="roleA" class="role-select">
+    <option value="toss">Toss the coin</option>
+    <option value="call">Call Head/Tail</option>
+</select>
+<select id="roleB" class="role-select">
+    <option value="call">Call Head/Tail</option>
+    <option value="toss">Toss the coin</option>
+</select>
+
+<!-- Coin Image -->
+<img src="Head.png" class="coin" id="coin">
+
+<div class="credit">Made by Suraj Kumar Nayak<br> CSE/052/22</div>
+
+<script>
+function startFlip() {
+    const captainA = document.getElementById('captainA').value || 'Captain A';
+    const captainB = document.getElementById('captainB').value || 'Captain B';
+    const roleA = document.getElementById('roleA').value;
+    const roleB = document.getElementById('roleB').value;
+
+    let tosser, caller;
+    if (roleA === 'toss') { tosser = captainA; caller = captainB; }
+    else { tosser = captainB; caller = captainA; }
+
+    // Ask the caller for their choice
+    const callerChoice = prompt(`${caller}, choose Head or Tail:`).toLowerCase();
+    const coin = document.getElementById('coin');
+    
+    // Countdown & Flip Animation
+    let countdown = 3;
+    const countdownDiv = document.createElement('div');
+    countdownDiv.className = 'countdown';
+    document.body.appendChild(countdownDiv);
+
+    const flipInterval = setInterval(() => {
+        if (coin.src.includes('Head')) coin.src = 'Tail.png';
+        else coin.src = 'Head.png';
+    }, 200);
+
+    const interval = setInterval(() => {
+        if(countdown > 0){
+            countdownDiv.textContent = `Flipping the coin... ${countdown}`;
+            countdown--;
+        } else {
+            clearInterval(interval);
+            clearInterval(flipInterval);
+            document.body.removeChild(countdownDiv);
+
+            // Final coin result
+            const coinResult = Math.random() < 0.5 ? 'head' : 'tail';
+            coin.src = coinResult === 'head' ? 'Head.png' : 'Tail.png';
+
+            // Determine winner
+            let winner = (callerChoice === coinResult) ? caller : tosser;
+
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = `<strong>${winner}</strong> is the WINNER!<br>Result: ${coinResult.toUpperCase()}`;
+            document.body.appendChild(resultDiv);
+
+            setTimeout(() => { document.body.removeChild(resultDiv); }, 5000);
+        }
+    }, 1000);
+}
+
+// Click coin to start flip
+document.getElementById('coin').onclick = startFlip;
+</script>
+
+</body>
+</html>
